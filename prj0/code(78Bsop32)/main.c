@@ -4,30 +4,47 @@
 void main() {
   SysInit();
   VarsInit();
-  F_ledOn();
-  delayMs(500);
+  //使能看门狗
+  F_turnOnWDT();
   while (1) {
     //喂狗
-    // F_turnOnWDT();
-    // user coding
-    // F_ledOff();
-    // delayMs(500);
-    // F_ledOn();
-    // delayMs(500);
-    GetKeys();
-    if (D_keyValue1 == keyValue) {
-      F_ledNeg();
-    }
-    keyValue = D_keyNull;
+    F_clearWDT();
+    //业务代码
+    TimeProcess();
+    TaskSetting();
+    TaskProcess();
+    DisplayProcess();
   }
 }
 //=============================================================================
-void delayMs(uint16_t msCount) {
-  uint16_t i, j;
-  for (i = 0; i < msCount; i++) {
-    for (j = 0; j < 1000; j++) {
-      /* code */
-      // F_turnOnWDT();
-    }
+void TimeProcess() {
+  static uint8_t timer5ms = 0;
+  static uint16_t second = 0;
+
+  if (b1ms) {
+    // 1ms 执行一次
+    b1ms = 0;
+    timer5ms++;
+    second++;
   }
+  if (timer5ms >= D_5ms) {
+    GetKeys();
+  }
+  if (second >= D_1000ms) {
+    // 1s 执行一次
+    second = 0;
+  }
+}
+//=============================================================================
+void TaskProcess() {}
+//=============================================================================
+void TaskSetting() {
+  if (D_keyValue1 == keyValue) {
+    F_ledNeg();
+  }
+  keyValue = D_keyNull;
+}
+//=============================================================================
+void DisplayProcess() {
+  // F_ledOn();
 }
